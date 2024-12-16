@@ -1,0 +1,53 @@
+<header class="box-border rounded-sm shadow-md">
+    <div class="flex w-full p-3">
+        <div class="flex-1 flex">
+            <a class="font-bold color text-xl" href="/">airbnb</a>
+            <% if (isLoggedIn) { %>
+            <% if (user.userType === 'guest') { %>
+            <div class="flex-1 ml-5">
+                <a class="font-bold color text-xl" href="/homes">Homes</a>
+            </div>
+            <% } %>
+            <% } %>
+        </div>
+    <nav class="flex-1 flex flex-row-reverse">
+            <% if (isLoggedIn) { %>
+                <form action="/logout" method="POST"> <!--form tag cause Post req response me kuch leke ja sake -->
+                    <input type="submit" value="Logout"
+                        class="font-bold hover:bg-rose-200 hover:rounded-full pl-3 pr-3" />
+                </form>
+            <% } else { %>
+                <a class="5" href="/signup">
+                    <div class="font-bold hover:bg-rose-200 hover:rounded-full pl-3 pr-3">
+                        Sign Up
+                    </div>
+                </a>
+                <a class="5" href="/login">
+                    <div class="font-bold hover:bg-rose-200 hover:rounded-full pl-3 pr-3">
+                        Login
+                    </div>
+                </a>
+            <% } %>
+            <% if (isLoggedIn) { %>
+                <% if (user.userType === 'guest') { %>
+                    <a class="" href="/favourites">
+                        <div class="font-bold hover:bg-rose-100 color hover:rounded-full pl-3 pr-3">
+                            Fav. Home
+                        </div>
+                    </a>
+                <% } else { %> 
+                    <a class="5" href="/host/add-home">
+                        <div class="font-bold hover:bg-gray-200 hover:rounded-full pl-3 pr-3">
+                            Airbnb your home
+                        </div>
+                    </a>
+                    <a class="" href="/host/host-homes">
+                        <div class="font-bold hover:bg-rose-100 color hover:rounded-full pl-3 pr-3">
+                            My Homes
+                        </div>
+                    </a>
+                <% } %>
+            <% } %>
+        </nav>
+    </div>
+</header>

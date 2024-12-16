@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>
+    <%= pageTitle %>
+  </title>
+  <link rel="stylesheet" href="/styles/output.css">
+  <link rel="stylesheet" href="/styles/input.css">
+</head>
+
+<body>
+  <div class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+    <div class="bg-white rounded-lg shadow-lg w-[min(90%,400px)] p-6">
+      <center class="text-lg font-semibold mb-4">Login to Airbnb</center>
+      <%- include('../partials/errorMessages') %>
+      <form action="/login" method="POST">
+        <label class="block text-sm font-medium mb-2">Email</label>
+        <div class="flex items-center border rounded-md mb-4">
+
+          <input type="email" name="email" placeholder="Phone number"
+            class="flex-1 px-3 py-2 bg-rose-50 rounded-r-md focus:outline-none" />
+        </div>
+        <label class="block text-sm font-medium mb-2">Password</label>
+        <div class="flex items-center border rounded-md mb-1 ">
+
+          <input type="password" name="password" placeholder="Enter your Password "
+            class="flex-1 px-3 py-2 bg-rose-50 rounded-r-md focus:outline-none" />
+        </div>
+        <a class=" mb-4  text-blue-500 hover:text-blue-800 " href="forgot-password">
+          Forgot Password
+        </a>
+        <input type="submit" value="Continue"
+          class="w-full py-2  text-white bg-rose-500 rounded-md hover:bg-rose-600 my-4 mb-4">
+      </form>
+
+
+      <div class="space-y-2">
+       
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

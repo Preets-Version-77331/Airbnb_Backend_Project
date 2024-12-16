@@ -1,0 +1,60 @@
+<%- include('../partials/head')%>
+</head>
+<body>
+  <%- include('../partials/errorMessages') %>
+    <h1 class="text-4xl font-bold text-rose-500 mb-8 pt-7 text-center"><%= editing ? 'Edit' : 'Add' %> your Home</h1>
+    <div class="flex justify-center">
+      <form action="/host/<%= editing ? "edit-home" : "add-home"%>" method="POST" enctype="multipart/form-data" class="w-full max-w-md">
+        <input type="hidden" name="id" value="<%= editing ? home._id : ''%>" />
+        <input 
+          type="text" 
+          name="houseName"
+          value="<%= editing ? home.houseName : '' %>"
+          placeholder="Name of your house"
+          class="w-full px-4 py-2 mb-4 border border-rose-400 rounded-lg focus:outline-none focus:border-rose-500"
+        />
+        <input 
+          type="text" 
+          name="price"
+          value="<%= editing ? home.price : '' %>"
+          placeholder="Daily rent of your house"
+          class="w-full px-4 py-2 mb-4 border border-rose-400 rounded-lg focus:outline-none focus:border-rose-500"
+        />
+        <input 
+          type="text" 
+          name="location"
+          value="<%= editing ? home.location : '' %>"
+          placeholder="Home town/city location"
+          class="w-full px-4 py-2 mb-4 border border-rose-400 rounded-lg focus:outline-none focus:border-rose-500"
+        />
+        <input 
+          type="text" 
+          name="rating"
+          value="<%= editing ? home.rating : '' %>"
+          placeholder="Rating of your houseName"
+          class="w-full px-4 py-2 mb-4 border border-rose-400 rounded-lg focus:outline-none focus:border-rose-500"
+        />
+        <input 
+          type="file"
+          name="photo"
+          class="w-full px-4 py-2 mb-4 border border-rose-400 rounded-lg focus:outline-none focus:border-rose-500"
+        />
+        <textarea 
+          type="text" 
+          name="description"
+          placeholder="Describe your house..............."
+          class="w-full px-4 py-2 mb-4 border border-rose-400 rounded-lg focus:outline-none focus:border-rose-500"
+        ><%= editing ? home.description : '' %></textarea>
+        <div class="flex justify-center">
+          <input 
+            type="submit" 
+            value="<%= editing ? 'Update' : 'Add' %> Home"
+            class="bg-rose-400 hover:bg-rose-500 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 cursor-pointer"
+          >
+        </div>
+      </form>
+    </div>
+  </main>
+</body>
+</html>
+

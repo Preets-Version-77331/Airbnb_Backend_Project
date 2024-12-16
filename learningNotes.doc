@@ -1,0 +1,236 @@
+<%- include('../partials/error-messages') %>
+
+
+Lecture Notes : 
+1). Cookies Concept > 
+used to store authentication  to use it perform various taskes
+ why we need to store cookies in  users browser > 
+ cause : 
+
+[1] Server running at: http://localhost:3000
+[1] [nodemon] restarting due to changes...
+[1] [nodemon] starting `node app.js app.js`
+[1] Server running at: http://localhost:3000
+[1] Cookies  for get req:  undefined
+[1] Req Body :  { email: 'preetchauhan76747@gmail.com', password: '410' } Logged In :  true
+[1] Cookies  for get req:  undefined
+
+it can't be rest in next http request 
+
+Using a coookie > 
+Understand why a global variable whould not work .
+cause if we did this then the global variable for store authentication is still common for every user 
+so we can't track users req  ki kon se user ki  req ayi hai 
+syntex to store a cookie > 
+res.cookie('key', value); 
+
+2). Storages : 
+Multer Node.js ke liye ek middleware hai jo file uploads handle karta hai. 
+Multer me storage ek configuration option hai jo batata hai ki uploaded files 
+ko server par kaise aur kahan store karna hai. storage do tarike se kaam kar sakta hai:
+
+1. Disk Storage (diskStorage)
+diskStorage ka use uploaded files ko server ke filesystem (disk) me save
+ karne ke liye hota hai.
+
+Syntax:
+javascript
+Copy code
+const multer = require('multer');
+
+// Storage configuration
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    // File ko save karne ka folder specify karein
+    cb(null, './uploads'); // 'uploads' folder me save karega
+  },
+  filename: function (req, file, cb) {
+    // File ka naam set karein
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + '-' + file.originalname);
+  }
+});
+
+// Multer instance banayein
+const upload = multer({ storage: storage });
+
+module.exports = upload;
+Explanation:
+destination: Yeh function specify karta hai ki file kahan save hogi. cb(null, './uploads') ka matlab 
+hai ki file uploads folder me save hogi.
+filename: Yeh function uploaded file ka naam set karta hai. Default me file.originalname hota hai
+ (jo user ne diya hota hai), lekin aap unique naam generate karne ke liye suffix add kar sakte ho.
+Example: Route me Use Karna
+
+Code Example: 
+
+const express = require('express');
+const app = express();
+const upload = require('./path-to-upload'); // Apne multer configuration ka path
+
+app.post('/upload', upload.single('file'), (req, res) => {
+  res.send('File uploaded successfully!');
+});
+
+app.listen(3000, () => {
+  console.log('Server is running on port 3000');
+});
+
+2. Memory Storage (memoryStorage)
+Memory storage ka use files ko buffer (RAM) me temporarily save karne ke liye hota hai. 
+Is tarah ki storage tab useful hai jab aapko file ko process karna hai bina disk pe save kiye.
+
+Syntax:
+code
+const multer = require('multer');
+
+// Memory storage configuration
+const storage = multer.memoryStorage();
+
+// Multer instance banayein
+const upload = multer({ storage: storage });
+
+module.exports = upload;
+
+Features:
+
+File RAM me store hoti hai as a buffer (req.file.buffer).
+File disk pe nahi save hoti.
+Temporary processing ke liye use hoti hai (e.g., resizing image, uploading to cloud).
+
+Multer Options:
+
+Aap limits aur fileFilter options bhi configure kar sakte ho:
+
+javascript
+Copy code
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 1024 * 1024 * 5 }, // File size limit (5MB)
+  fileFilter: function (req, file, cb) {
+    // Sirf specific file types allow karne ke liye
+    if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+      cb(null, true);
+    } else {
+      cb(null, false);
+    }
+  }
+});
+Summary:
+diskStorage: Files ko disk me save karta hai (path aur filename configure kar sakte ho).
+memoryStorage: Files ko RAM me temporarily save karta hai (useful for cloud uploads or processing).
+Multer ka storage function aapko file management me flexibility deta hai, jo aapke use case ke
+ hisaab se customize kiya ja sakta hai.
+
+
+4). filtering the file/customize the image name :
+ with filter method : 
+ The error you're encountering (ENOENT: no such file or directory) occurs because the multer.diskStorage configuration is incorrect. Specifically, the property diskStorage is mistakenly nested inside multer.diskStorage. Instead, the correct property to use is destination. The multer.diskStorage function should look like this:
+
+Correct Code
+ code : 
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/'); // Ensure this directory exists
+    },
+    filename: (req, file, cb) => {
+        cb(null, new Date().toISOString().replace(/:/g, '-') + '-' + file.originalname);
+    }
+});
+
+const fileFilter = (req, file, cb) => {
+    const isValidFile = ['image/png', 'image/jpeg', 'image/jpg'].includes(file.mimetype);
+    cb(null, isValidFile);
+};
+
+const app = express();
+app.set('view engine', 'ejs');
+app.set('views', 'views');
+
+app.use(express.static(path.join(rootDir, 'public')));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(multer({ storage, fileFilter }).single('photo'));
+
+Key Changes: 
+
+destination Property:
+
+Replace diskStorage with destination.
+This specifies the directory where files will be stored. Ensure the 'uploads/' directory exists before starting the server.
+File Naming:
+The new Date().toISOString() method is used to generate a unique filename. Since : characters in ISO strings can cause issues on Windows systems, I replaced them with -.
+Additional Notes:
+Ensure that the uploads/ directory exists in your project. If it doesn’t, you can create it manually or programmatically:
+
+Code: 
+const fs = require('fs');
+const uploadDir = path.join(__dirname, 'uploads');
+
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+}
+If the directory doesn’t exist, multer will throw the ENOENT error because it cannot save the file.
+
+For debugging purposes, add middleware to log uploaded file information:
+
+Code :
+app.post('/upload', (req, res) => {
+    console.log(req.file);
+    res.send('File uploaded successfully');
+});
+
+
+
+
+
+
+
+===============================================================================================
+____________
+Bugs/Debugs :
+
+ 1). At initailly when is start my server app don't cause unexpected error (homes.json is empty) 
+
+ 2). agar Favurites button pe click kerte hai to ye use home ki id ko Post req ke sath le jata
+or iss id se hum user ko registered home me se favurites ids ko filter ker ke show kerte hai 
+but remenber uske liye ak approach ye hai ki file ko hall home read ()
+_______
+Doubts :-
+
+  <!-- Transparent Overlay and Modal -
+==============================================================================================
+SQL : -
+1). SQL Injection Attacks >
+
+
+exports.postHomeAdded = (req, res, next) => {
+    const {houseName, price, location, rating, photoUrl, description} = req.body; 
+    console.log('Home Details: ', req.body);
+    const newHome = new Home(houseName, price, location, rating, photoUrl, description); 
+    newHome.save().then(([rows]) => {
+        res.render('host/airbnbHomeAdded', {pageTitle: "Host's home"});
+    });   
+} 
+
+
+__________
+MongoDB :-
+
+1). MongoDB is the product and the company that builds it.
+2). The name comesfrom the work Humongous.
+3). NoSQL Document Database: Stores data in flexible, JSON-Like documents.
+4). Dynamics Schema: Allows fields to vary across doucuments without predifined Schemas.
+5). High Performance: Optimized for fast read and write operations. 
+6). Scalability: Supports horizontal Scaling through sharding.
+7). High Availabilty: Provides replication with automatic failover. 
+8). Rich Query Capabilities: Offers powerful querying, indexing, and aggregation. 
+aggregation means total  like in all object collect all sales amount and then same of alll all them 
+indexing means fetching data through fields 
+same querying 
+
+9). Geospatial and Text Search: Includes support for location based all full-text
+queries. 
+10). Cross-Platform Compatibilty: Works with various operating systems and programming 
+languges.
+11). Easy Inegration: Integrates smoothly with mordern development stacks.
+
